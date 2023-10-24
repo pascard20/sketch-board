@@ -28,6 +28,7 @@ body {
     justify-content: center;
     align-items: center;
     font-family: 'Figtree', sans-serif;
+    padding: 25px;
 }
 
 .wrapper {
@@ -37,6 +38,7 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 15px 20px;
+    position: absolute;
 }
 
 .btn {
@@ -47,6 +49,7 @@ body {
     cursor: pointer;
     box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3);
     font-size: 16px;
+    animation: roll-up .9s .4s both;
 }
 
 .btn:hover {
@@ -63,6 +66,7 @@ body {
     gap: var(--gridGap);
     box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, .3);
     background-color: #eaeaea;
+    animation: fade-in .5s .2s both;
 }
 
 .grid__item {
@@ -73,4 +77,47 @@ body {
 
 .grid__item.active {
     background-color: #333;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+@keyframes roll-up {
+    0% {
+        opacity: 0;
+        transform: translateY(75px);
+    }
+
+    25% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@media (max-width: 750px) {
+    body {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-height: 800px) {
+    body {
+        align-items: flex-start;
+    }
 }
