@@ -108,21 +108,21 @@ body {
     background-color: #eaeaea;
     animation: fade-in .5s .2s both;
     -webkit-user-select: none;
-    /* Safari */
     -ms-user-select: none;
-    /* IE 10 and IE 11 */
     user-select: none;
-    /* Standard syntax */
-    /* pointer-events: none; */
 }
 
 .grid__item {
     width: var(--gridItemSize);
     height: var(--gridItemSize);
     background-color: #fff;
-    border: 0 solid #eaeaea;
+    border: 0 solid rgb(224, 224, 224, 0);
     border-width: 0 var(--gridBorder) var(--gridBorder) 0;
-    transition: .05s;
+    transition: all .05s, border .4s;
+}
+
+.grid__wrapper.grid--on>.grid__item {
+    border-color: rgba(224, 224, 224, 1)
 }
 
 .grid__item.active {

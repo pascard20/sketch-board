@@ -3,6 +3,7 @@
 elemGridWrapper = document.querySelector('.grid__wrapper');
 elemBtnReset = document.querySelector('.btn--reset');
 elemBtnBoard = document.querySelector('.btn--board');
+elemBtnGrid = document.querySelector('.btn--grid')
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -50,13 +51,18 @@ const handleNewBoard = () => {
     if (newItemCount > 0 && newItemCount <= MAX_ITEM_COUNT) createBoard(newItemCount);
 };
 
+const handleToggleGrid = () => {
+    elemGridWrapper.classList.toggle('grid--on');
+}
+
 /* --------------------------------- EVENTS --------------------------------- */
 
 elemGridWrapper.addEventListener('mouseover', handleHover);
 elemGridWrapper.addEventListener('mousedown', handleClick);
 document.addEventListener('mouseup', handleRelease);
-elemBtnReset.addEventListener('click', handleReset)
-elemBtnBoard.addEventListener('click', handleNewBoard)
+elemBtnReset.addEventListener('click', handleReset);
+elemBtnBoard.addEventListener('click', handleNewBoard);
+elemBtnGrid.addEventListener('click', handleToggleGrid);
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
