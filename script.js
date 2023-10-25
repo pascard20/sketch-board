@@ -6,6 +6,7 @@ elemBtnBoard = document.querySelector('.btn--board');
 elemBtnGrid = document.querySelector('.btn--grid');
 elemBtnEraser = document.querySelector('.btn--eraser');
 elemBtnBrush = document.querySelector('.btn--brush');
+elemColorInput = document.querySelector('.color-input');
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -17,7 +18,7 @@ let DEFAULT_COLOR = '#fff';
 /* -------------------------------- VARIABLES ------------------------------- */
 
 let clicked = false;
-let currentColor = '#333';
+let currentColor = '#333333';
 let cachedColor = currentColor;
 
 /* -------------------------------- FUNCTIONS ------------------------------- */
@@ -75,6 +76,13 @@ const handleBrush = () => {
     }
 }
 
+const handleColorChange = event => {
+    const color = event.target.value;
+    if (elemBtnBrush.className.includes('switched-on')) {
+        currentColor = color;
+    } else cachedColor = color;
+}
+
 /* --------------------------------- EVENTS --------------------------------- */
 
 elemGridWrapper.addEventListener('mouseover', handleHover);
@@ -85,7 +93,9 @@ elemBtnBoard.addEventListener('click', handleNewBoard);
 elemBtnGrid.addEventListener('click', handleToggleGrid);
 elemBtnEraser.addEventListener('click', handleEraser);
 elemBtnBrush.addEventListener('click', handleBrush);
+elemColorInput.addEventListener('change', handleColorChange);
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
 createBoard(DEFAULT_ITEM_COUNT);
+elemColorInput.value = currentColor;
