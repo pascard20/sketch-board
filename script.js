@@ -5,6 +5,7 @@ elemBtnReset = document.querySelector('.btn--reset');
 elemBtnBoard = document.querySelector('.btn--board');
 elemBtnGrid = document.querySelector('.btn--grid');
 elemBtnEraser = document.querySelector('.btn--eraser');
+elemBtnBrush = document.querySelector('.btn--brush');
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -59,15 +60,19 @@ const handleToggleGrid = () => {
     elemGridWrapper.classList.toggle('grid--on');
 }
 
-const handleEraser = event => {
-    const btn = event.target;
-    if (btn.className.includes('eraser--on')) {
-        currentColor = cachedColor;
-    } else {
+const handleEraser = () => {
+    if (!elemBtnEraser.className.includes('switched-on')) {
+        [elemBtnEraser, elemBtnBrush].forEach(item => item.classList.toggle('switched-on'))
         cachedColor = currentColor;
         currentColor = DEFAULT_COLOR;
     }
-    btn.classList.toggle('eraser--on');
+}
+
+const handleBrush = () => {
+    if (!elemBtnBrush.className.includes('switched-on')) {
+        [elemBtnEraser, elemBtnBrush].forEach(item => item.classList.toggle('switched-on'))
+        currentColor = cachedColor;
+    }
 }
 
 /* --------------------------------- EVENTS --------------------------------- */
@@ -79,6 +84,7 @@ elemBtnReset.addEventListener('click', handleReset);
 elemBtnBoard.addEventListener('click', handleNewBoard);
 elemBtnGrid.addEventListener('click', handleToggleGrid);
 elemBtnEraser.addEventListener('click', handleEraser);
+elemBtnBrush.addEventListener('click', handleBrush);
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
