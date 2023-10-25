@@ -1,3 +1,5 @@
+/* ---------------------------------- RESET --------------------------------- */
+
 * {
     margin: 0;
     padding: 0;
@@ -15,12 +17,16 @@ a {
     text-decoration: none;
 }
 
+/* -------------------------------- VARIABLES ------------------------------- */
+
 :root {
     --gridWrapperSize: 700px;
     --gridItemCount: 1;
     --gridBorder: 1px;
     --gridItemSize: calc(var(--gridWrapperSize) / var(--gridItemCount));
 }
+
+/* --------------------------------- GENERAL -------------------------------- */
 
 html,
 body {
@@ -35,6 +41,9 @@ body {
     font-family: 'Figtree', sans-serif;
     padding: 25px;
     background-color: #FAFAFA;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .wrapper {
@@ -43,6 +52,8 @@ body {
     flex: 2 0 auto;
     align-items: center;
 }
+
+/* ---------------------------------- MENU ---------------------------------- */
 
 .menu {
     display: flex;
@@ -62,7 +73,7 @@ body {
 .menu__heading {
     text-transform: uppercase;
     font-weight: 700;
-    animation: roll-up .9s .4s both;
+    animation: roll-up 1.1s .1s both;
     color: #333;
     font-size: 32px;
     display: block;
@@ -82,6 +93,8 @@ body {
     transform: translateX(-50%);
 }
 
+/* --------------------------------- BUTTONS -------------------------------- */
+
 .btn {
     padding: 7px 14px;
     border-radius: 7px;
@@ -90,12 +103,18 @@ body {
     cursor: pointer;
     box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3);
     font-size: 16px;
-    animation: roll-up .9s .4s both;
+    animation: roll-up 1.1s .1s both;
 }
 
 .btn:hover {
     background-color: #505050;
 }
+
+.btn.eraser--on {
+    background-color: #505050;
+}
+
+/* ---------------------------------- GRID ---------------------------------- */
 
 .grid__wrapper {
     width: calc(var(--gridWrapperSize) - var(--gridBorder));
@@ -105,11 +124,8 @@ body {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, .3);
-    background-color: #eaeaea;
+    background-color: #fff;
     animation: fade-in .5s .2s both;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .grid__item {
@@ -129,12 +145,14 @@ body {
     background-color: #333;
 }
 
+/* --------------------------------- FOOTER --------------------------------- */
+
 .footer {
     display: flex;
     align-items: flex-end;
     font-size: 20px;
     flex: 1;
-    opacity: .5;
+    color: rgba(0, 0, 0, .3);
 }
 
 .footer__wrapper {
@@ -150,7 +168,6 @@ body {
 .footer__link {
     margin-top: 1px;
     font-size: 1.25em;
-    color: #333;
     transition: .25s;
     transform: scale(1);
 }
@@ -159,6 +176,8 @@ body {
     margin-left: 0;
     transform: scale(1.15);
 }
+
+/* ------------------------------- ANIMATIONS ------------------------------- */
 
 @keyframes fade-in {
     from {
@@ -190,6 +209,8 @@ body {
         transform: translateY(0px);
     }
 }
+
+/* ------------------------------ MEDIA QUERIES ----------------------------- */
 
 @media (max-width: 750px) {
     body {
