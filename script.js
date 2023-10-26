@@ -12,6 +12,8 @@ elemColorEyedropper = document.querySelector('.color__picker');
 elemColorWrapper = document.querySelector('.color__wrapper');
 elemBtnClassic = document.querySelector('.btn--classic');
 elemBtnRandom = document.querySelector('.btn--random');
+elemSlider = document.querySelector('.slider__opacity');
+elemSliderLabel = document.querySelector('.slider__opacity__label');
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -134,18 +136,37 @@ const randomizeColor = (decimalColor, factor) => {
 
 /* -------------------------------- HANDLERS -------------------------------- */
 
+const interpolateWithOpacity = (firstValue, secondValue, opacity) => {
+    return Math.round(+firstValue * (1 - opacity) + +secondValue * opacity);
+}
+
+const calculateWithOpacity = (elemCurrent, rgbArray, opacity) => {
+    const oldColor = elemCurrent.style.backgroundColor;
+    const oldRgb = oldColor.slice(4, -1).split(', ');
+    return [
+        interpolateWithOpacity(oldRgb[0], rgbArray[0], opacity),
+        interpolateWithOpacity(oldRgb[1], rgbArray[1], opacity),
+        interpolateWithOpacity(oldRgb[2], rgbArray[2], opacity)
+    ];
+}
+
 const handleHover = event => {
     elemCurrent = event.target;
     if (elemCurrent.className.includes('wrapper')) return;
-    let newColor = currentColor;
-    if (random) {
-        rgb = separateHexValues(currentColor);
-        r = randomizeColor(rgb[0], 1);
-        g = randomizeColor(rgb[1], 1);
-        b = randomizeColor(rgb[2], 1);
-        newColor = '#' + rgbToHex([r, g, b]);
+    if (clicked) {
+        const rgb = separateHexValues(currentColor);
+        let r = rgb[0];
+        let g = rgb[1];
+        let b = rgb[2];
+        if (random) {
+            r = randomizeColor(r, 1);
+            g = randomizeColor(g, 1);
+            b = randomizeColor(b, 1);
+        }
+        const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], +elemSlider.value);
+        const newColor = '#' + rgbToHex(rgbOpacity);
+        elemCurrent.style.backgroundColor = newColor;
     }
-    if (clicked) elemCurrent.style.backgroundColor = newColor;
 };
 
 const handleRelease = () => clicked = false;
@@ -234,16 +255,20 @@ const handleHexInput = () => {
     elemColorInput.value = color;
 }
 
-const handleClassic = event => {
+const handleClassic = () => {
     switchButtons(elemBtnClassic, elemBtnRandom, () => {
         random = false;
     })
 }
 
-const handleRandom = event => {
+const handleRandom = () => {
     switchButtons(elemBtnRandom, elemBtnClassic, () => {
         random = true;
     })
+}
+
+const handleSlider = () => {
+    elemSliderLabel.textContent = elemSlider.value;
 }
 
 /* --------------------------------- EVENTS --------------------------------- */
@@ -262,9 +287,11 @@ elemColorEyedropper.addEventListener('click', handleEyedropper);
 elemColorHex.addEventListener('input', handleHexInput);
 elemBtnClassic.addEventListener('click', handleClassic);
 elemBtnRandom.addEventListener('click', handleRandom);
+elemSlider.addEventListener('input', handleSlider)
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
 createBoard(DEFAULT_ITEM_COUNT);
 elemColorInput.value = currentColor;
 elemColorHex.value = currentColor.slice(1);
+elemSliderLabel.textContent = elemSlider.value;
