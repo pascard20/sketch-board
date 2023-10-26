@@ -10,6 +10,8 @@ elemColorInput = document.querySelector('.color__input');
 elemColorHex = document.querySelector('.color__hex__input');
 elemColorEyedropper = document.querySelector('.color__picker');
 elemColorWrapper = document.querySelector('.color__wrapper');
+elemBtnClassic = document.querySelector('.btn--classic');
+elemBtnRandom = document.querySelector('.btn--random');
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -23,6 +25,7 @@ const DEFAULT_COLOR = '#ffffff';
 
 let clicked = false;
 let eyedropper = false;
+let random = false;
 let currentColor = '#333333';
 let cachedColor = currentColor;
 
@@ -38,16 +41,21 @@ const createBoard = itemCount => {
     }
 };
 
+const separateHexValues = hex => {
+    if (hex[0] == '#') hex = hex.slice(1);
+    r = hexToDecimal(hex.slice(0, 2));
+    g = hexToDecimal(hex.slice(2, 4));
+    b = hexToDecimal(hex.slice(4));
+    return [r, g, b];
+}
+
 const setColor = color => {
     if (elemBtnBrush.className.includes('switched-on')) {
         currentColor = color;
     } else cachedColor = color;
 
-    if (color[0] == '#') color = color.slice(1);
-    r = hexToDecimal(color.slice(0, 2));
-    g = hexToDecimal(color.slice(2, 4));
-    b = hexToDecimal(color.slice(4));
-    if (r + g + b > 255 * 3 / 2.5) {
+    rgb = separateHexValues(color);
+    if (rgb[0] + rgb[1] + rgb[2] > 255 * 3 / 2.5) {
         elemColorWrapper.classList.add('dark');
     } else elemColorWrapper.classList.remove('dark');
 }
@@ -102,13 +110,42 @@ const autocompleteHex = hex => {
     return endHex;
 }
 
-/* -------------------------------- HANDLERS -------------------------------- */
+const switchButtons = (clickedButton, otherButtons, additionalCommands) => {
+    if (!clickedButton.className.includes('switched-on')) {
+        let btnList;
+        if (Array.isArray(otherButtons)) {
+            btnList = [clickedButton, ...otherButtons];
+        } else btnList = [clickedButton, otherButtons];
+        btnList.forEach(item => item.classList.toggle('switched-on'));
+        additionalCommands();
+    }
+}
 
+const randomizeColor = (decimalColor, factor) => {
+    const randomValue = (Math.floor(Math.random() * 255 * 2 + 1) - 255);
+    let newColor = decimalColor + randomValue * factor;
+    if (newColor > 255) {
+        newColor = 255;
+    } else if (newColor < 0) {
+        newColor = 0;
+    }
+    return newColor;
+}
+
+/* -------------------------------- HANDLERS -------------------------------- */
 
 const handleHover = event => {
     elemCurrent = event.target;
     if (elemCurrent.className.includes('wrapper')) return;
-    if (clicked) elemCurrent.style.backgroundColor = currentColor;
+    let newColor = currentColor;
+    if (random) {
+        rgb = separateHexValues(currentColor);
+        r = randomizeColor(rgb[0], 1);
+        g = randomizeColor(rgb[1], 1);
+        b = randomizeColor(rgb[2], 1);
+        newColor = '#' + rgbToHex([r, g, b]);
+    }
+    if (clicked) elemCurrent.style.backgroundColor = newColor;
 };
 
 const handleRelease = () => clicked = false;
@@ -129,18 +166,16 @@ const handleToggleGrid = () => {
 }
 
 const handleEraser = () => {
-    if (!elemBtnEraser.className.includes('switched-on')) {
-        [elemBtnEraser, elemBtnBrush].forEach(item => item.classList.toggle('switched-on'))
+    switchButtons(elemBtnEraser, elemBtnBrush, () => {
         cachedColor = currentColor;
         currentColor = DEFAULT_COLOR;
-    }
+    })
 }
 
 const handleBrush = () => {
-    if (!elemBtnBrush.className.includes('switched-on')) {
-        [elemBtnEraser, elemBtnBrush].forEach(item => item.classList.toggle('switched-on'))
+    switchButtons(elemBtnBrush, elemBtnEraser, () => {
         currentColor = cachedColor;
-    }
+    })
 }
 
 const handleColorChange = () => {
@@ -174,7 +209,6 @@ const handleClick = event => {
             setColor(hex);
             elemColorInput.value = hex;
             elemColorHex.value = hex.slice(1);
-
         }
     } else if (elemClicked.closest('.grid__wrapper')) {
         clicked = true;
@@ -200,6 +234,18 @@ const handleHexInput = () => {
     elemColorInput.value = color;
 }
 
+const handleClassic = event => {
+    switchButtons(elemBtnClassic, elemBtnRandom, () => {
+        random = false;
+    })
+}
+
+const handleRandom = event => {
+    switchButtons(elemBtnRandom, elemBtnClassic, () => {
+        random = true;
+    })
+}
+
 /* --------------------------------- EVENTS --------------------------------- */
 
 window.addEventListener('mousedown', handleClick);
@@ -214,6 +260,8 @@ elemBtnBrush.addEventListener('click', handleBrush);
 elemColorInput.addEventListener('input', handleColorChange);
 elemColorEyedropper.addEventListener('click', handleEyedropper);
 elemColorHex.addEventListener('input', handleHexInput);
+elemBtnClassic.addEventListener('click', handleClassic);
+elemBtnRandom.addEventListener('click', handleRandom);
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
