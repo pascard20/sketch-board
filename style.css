@@ -142,6 +142,11 @@ html.eyedropper-on .menu * {
     height: 60px;
     overflow: hidden;
     position: relative;
+    color: white;
+}
+
+.color__wrapper.dark {
+    color: #333;
 }
 
 .color__wrapper+* {
@@ -186,8 +191,7 @@ html.eyedropper-on .menu * {
 .color__hex,
 .color__picker {
     position: absolute;
-    color: #fff;
-    opacity: .5;
+    opacity: .6;
     transition: .25s;
     background-color: transparent;
     cursor: pointer;

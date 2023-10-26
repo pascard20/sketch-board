@@ -9,6 +9,7 @@ elemBtnBrush = document.querySelector('.btn--brush');
 elemColorInput = document.querySelector('.color__input');
 elemColorHex = document.querySelector('.color__hex__input');
 elemColorEyedropper = document.querySelector('.color__picker');
+elemColorWrapper = document.querySelector('.color__wrapper');
 elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -41,6 +42,14 @@ const setColor = color => {
     if (elemBtnBrush.className.includes('switched-on')) {
         currentColor = color;
     } else cachedColor = color;
+
+    if (color[0] == '#') color = color.slice(1);
+    r = hexToDecimal(color.slice(0, 2));
+    g = hexToDecimal(color.slice(2, 4));
+    b = hexToDecimal(color.slice(4));
+    if (r + g + b > 255 * 3 / 2.5) {
+        elemColorWrapper.classList.add('dark');
+    } else elemColorWrapper.classList.remove('dark');
 }
 
 const numberToHex = num => {
