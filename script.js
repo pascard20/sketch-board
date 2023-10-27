@@ -36,6 +36,8 @@ let eyedropper = false;
 let random = false;
 let currentColor = '#333333';
 let cachedColor = currentColor;
+let cachedMode;
+let modeButtons = [...document.querySelectorAll('.btn--mode')];
 
 /* -------------------------------- FUNCTIONS ------------------------------- */
 
@@ -145,8 +147,6 @@ const selectTextInput = element => {
     element.select();
 }
 
-/* -------------------------------- HANDLERS -------------------------------- */
-
 const interpolateWithOpacity = (firstValue, secondValue, opacity) => {
     return Math.round(+firstValue * (1 - opacity) + +secondValue * opacity);
 }
@@ -160,6 +160,8 @@ const calculateWithOpacity = (elemCurrent, rgbArray, opacity) => {
         interpolateWithOpacity(oldRgb[2], rgbArray[2], opacity)
     ];
 }
+
+/* -------------------------------- HANDLERS -------------------------------- */
 
 const handleHover = event => {
     elemCurrent = event.target;
@@ -202,12 +204,22 @@ const handleEraser = () => {
         cachedColor = currentColor;
         currentColor = DEFAULT_COLOR;
     })
+    cachedMode = document.querySelector('.btn--mode.switched-on');
+    modeButtons.forEach(item => {
+        item.classList.remove('switched-on');
+        item.classList.add('disabled');
+        random = false;
+    });
 }
 
 const handleBrush = () => {
     switchButtons(elemBtnBrush, elemBtnEraser, () => {
         currentColor = cachedColor;
     })
+    cachedMode.classList.add('switched-on');
+    if (cachedMode.className.includes('btn--random')) random = true;
+    cachedMode = null;
+    modeButtons.forEach(item => item.classList.remove('disabled'));
 }
 
 const handleColorChange = () => {
@@ -271,15 +283,19 @@ const handleHexInput = () => {
 }
 
 const handleClassic = () => {
-    switchButtons(elemBtnClassic, elemBtnRandom, () => {
-        random = false;
-    })
+    if (!elemBtnClassic.className.includes('disabled')) {
+        switchButtons(elemBtnClassic, elemBtnRandom, () => {
+            random = false;
+        })
+    }
 }
 
 const handleRandom = () => {
-    switchButtons(elemBtnRandom, elemBtnClassic, () => {
-        random = true;
-    })
+    if (!elemBtnRandom.className.includes('disabled')) {
+        switchButtons(elemBtnRandom, elemBtnClassic, () => {
+            random = true;
+        })
+    }
 }
 
 const handleSlider = (slider, label) => {

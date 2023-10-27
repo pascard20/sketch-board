@@ -124,6 +124,10 @@ html.eyedropper-on .menu * {
     cursor: pointer;
 }
 
+.btn.disabled {
+    pointer-events: none;
+}
+
 .btn.btn--small {
     flex: 2;
     transition: .1s;
