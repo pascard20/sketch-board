@@ -34,8 +34,10 @@ const DEFAULT_RANDOMNESS = 0;
 let clicked = false;
 let eyedropper = false;
 let random = false;
+let eraser = false;
 let currentColor = '#333333';
 let cachedColor = currentColor;
+let cachedEyedropperColor;
 let cachedMode;
 let modeButtons = [...document.querySelectorAll('.btn--mode')];
 
@@ -59,15 +61,19 @@ const separateHexValues = hex => {
     return [r, g, b];
 }
 
+const setHexInputColor = brushColor => {
+    rgb = separateHexValues(brushColor);
+    if (rgb[0] + rgb[1] + rgb[2] > 255 * 3 / 2) {
+        elemColorWrapper.classList.add('dark');
+    } else elemColorWrapper.classList.remove('dark');
+}
+
 const setColor = color => {
     if (elemBtnBrush.className.includes('switched-on')) {
         currentColor = color;
     } else cachedColor = color;
 
-    rgb = separateHexValues(color);
-    if (rgb[0] + rgb[1] + rgb[2] > 255 * 3 / 2) {
-        elemColorWrapper.classList.add('dark');
-    } else elemColorWrapper.classList.remove('dark');
+    setHexInputColor(color);
 }
 
 const numberToHex = num => {
@@ -177,24 +183,41 @@ const calculateWithOpacity = (elemCurrent, rgbArray, opacity) => {
 
 const handleHover = event => {
     elemCurrent = event.target;
-    if (elemCurrent.className.includes('wrapper')) return;
-    if (clicked) {
-        const rgb = separateHexValues(currentColor);
-        let r = rgb[0];
-        let g = rgb[1];
-        let b = rgb[2];
-        let opacity = +elemSliderOpacity.value;
-        if (random) {
-            r = randomizeColor(r, +elemSliderRandomness.value);
-            g = randomizeColor(g, +elemSliderRandomness.value);
-            b = randomizeColor(b, +elemSliderRandomness.value);
-        } else opacity = randomizeOpacity(opacity, +elemSliderRandomness.value);
-        const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], opacity);
-        console.log(opacity);
-        const newColor = '#' + rgbToHex(rgbOpacity);
-        elemCurrent.style.backgroundColor = newColor;
+    if (elemCurrent.closest('.grid__wrapper')) {
+        console.log('aa');
+        if (elemCurrent.className.includes('wrapper')) return;
+        if (eyedropper) {
+            const hoverColorArray = elemCurrent.style.backgroundColor.slice(4, -1).split(', ');
+            const hoverColorHex = rgbToHex(hoverColorArray);
+            elemColorInput.value = '#' + hoverColorHex;
+            elemColorHex.value = hoverColorHex;
+            setHexInputColor(hoverColorHex);
+        }
+        if (clicked) {
+            const rgb = separateHexValues(currentColor);
+            let r = rgb[0];
+            let g = rgb[1];
+            let b = rgb[2];
+            let opacity = +elemSliderOpacity.value;
+            if (random) {
+                r = randomizeColor(r, +elemSliderRandomness.value);
+                g = randomizeColor(g, +elemSliderRandomness.value);
+                b = randomizeColor(b, +elemSliderRandomness.value);
+            } else opacity = randomizeOpacity(opacity, +elemSliderRandomness.value);
+            const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], opacity);
+            const newColor = '#' + rgbToHex(rgbOpacity);
+            elemCurrent.style.backgroundColor = newColor;
+        }
+    } else if (eyedropper) {
+        updateColorDisplay();
     }
 };
+
+const updateColorDisplay = () => {
+    elemColorInput.value = cachedEyedropperColor;
+    elemColorHex.value = cachedEyedropperColor.slice(1);
+    setHexInputColor(cachedEyedropperColor);
+}
 
 const handleRelease = () => clicked = false;
 
@@ -217,6 +240,7 @@ const handleEraser = () => {
     switchButtons(elemBtnEraser, elemBtnBrush, () => {
         cachedColor = currentColor;
         currentColor = DEFAULT_COLOR;
+        eraser = true;
     })
     cachedMode = document.querySelector('.btn--mode.switched-on');
     modeButtons.forEach(item => {
@@ -229,11 +253,14 @@ const handleEraser = () => {
 const handleBrush = () => {
     switchButtons(elemBtnBrush, elemBtnEraser, () => {
         currentColor = cachedColor;
+        eraser = false;
+        if (cachedMode) {
+            cachedMode.classList.add('switched-on');
+            if (cachedMode.className.includes('btn--random')) random = true;
+            cachedMode = null;
+        }
+        modeButtons.forEach(item => item.classList.remove('disabled'));
     })
-    cachedMode.classList.add('switched-on');
-    if (cachedMode.className.includes('btn--random')) random = true;
-    cachedMode = null;
-    modeButtons.forEach(item => item.classList.remove('disabled'));
 }
 
 const handleColorChange = () => {
@@ -244,6 +271,9 @@ const handleColorChange = () => {
 
 const handleEyedropper = event => {
     if (!eyedropper) {
+        if (eraser) {
+            cachedEyedropperColor = cachedColor;
+        } else cachedEyedropperColor = currentColor;
         const cursor = document.createElement("div");
         cursor.classList.add('eyedropper-cursor');
         cursor.innerHTML = `<i class="fa-solid fa-eye-dropper"></i>`;
@@ -267,7 +297,7 @@ const handleClick = event => {
             setColor(hex);
             elemColorInput.value = hex;
             elemColorHex.value = hex.slice(1);
-        }
+        } else updateColorDisplay();
     } else if (elemClicked.closest('.grid__wrapper')) {
         clicked = true;
         handleHover(event);
@@ -354,7 +384,7 @@ const handleChangeLabel = label => {
 
 window.addEventListener('mousedown', handleClick);
 window.addEventListener('mousemove', handleMouseMove);
-elemGridWrapper.addEventListener('mouseover', handleHover);
+window.addEventListener('mouseover', handleHover);
 window.addEventListener('mouseup', handleRelease);
 elemBtnReset.addEventListener('click', handleReset);
 elemBtnBoard.addEventListener('click', handleNewBoard);
