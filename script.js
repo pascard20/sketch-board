@@ -1,31 +1,33 @@
 /* -------------------------------- ELEMENTS -------------------------------- */
 
-elemGridWrapper = document.querySelector('.grid__wrapper');
-elemBtnReset = document.querySelector('.btn--reset');
-elemBtnBoard = document.querySelector('.btn--board');
-elemBtnGrid = document.querySelector('.btn--grid');
-elemBtnEraser = document.querySelector('.btn--eraser');
-elemBtnBrush = document.querySelector('.btn--brush');
-elemColorInput = document.querySelector('.color__input');
-elemColorHex = document.querySelector('.color__hex__input');
-elemColorEyedropper = document.querySelector('.color__picker');
-elemColorWrapper = document.querySelector('.color__wrapper');
-elemBtnClassic = document.querySelector('.btn--classic');
-elemBtnRandom = document.querySelector('.btn--random');
-elemSliderOpacity = document.querySelector('.slider__opacity');
-elemSliderOpacityLabel = document.querySelector('.slider__opacity__label');
-elemSliderRandomness = document.querySelector('.slider__randomness');
-elemSliderRandomnessLabel = document.querySelector('.slider__randomness__label');
-elemRoot = document.documentElement;
+const elemGridWrapper = document.querySelector('.grid__wrapper');
+const elemBtnReset = document.querySelector('.btn--reset');
+const elemBtnBoard = document.querySelector('.btn--board');
+const elemBtnGrid = document.querySelector('.btn--grid');
+const elemBtnEraser = document.querySelector('.btn--eraser');
+const elemBtnBrush = document.querySelector('.btn--brush');
+const elemColorInput = document.querySelector('.color__input');
+const elemColorHex = document.querySelector('.color__hex__input');
+const elemColorEyedropper = document.querySelector('.color__picker');
+const elemColorWrapper = document.querySelector('.color__wrapper');
+const elemBtnClassic = document.querySelector('.btn--classic');
+const elemBtnRandom = document.querySelector('.btn--random');
+const elemSliderOpacity = document.querySelector('.slider__opacity');
+const elemSliderOpacityLabel = document.querySelector('.slider__opacity__label');
+const elemSliderRandomness = document.querySelector('.slider__randomness');
+const elemSliderRandomnessLabel = document.querySelector('.slider__randomness__label');
+const elemRoot = document.documentElement;
 
 /* -------------------------------- CONSTANTS ------------------------------- */
 
 const DEFAULT_ITEM_COUNT = 16;
 const MAX_ITEM_COUNT = 100;
+const MAX_SLIDER_LABEL_LENGTH = 4;
 const HEX_REGEX = /([^a-f0-9])/gi;
+const NUM_REGEX = /([^0-9\.])/gi;
 const DEFAULT_COLOR = '#ffffff';
 const DEFAULT_OPACITY = 1;
-const DEFAULT_RANDOMNESS = 1;
+const DEFAULT_RANDOMNESS = 0;
 
 /* -------------------------------- VARIABLES ------------------------------- */
 
@@ -139,6 +141,10 @@ const randomizeColor = (decimalColor, factor) => {
     return newColor;
 }
 
+const selectTextInput = element => {
+    element.select();
+}
+
 /* -------------------------------- HANDLERS -------------------------------- */
 
 const interpolateWithOpacity = (firstValue, secondValue, opacity) => {
@@ -247,13 +253,17 @@ const handleMouseMove = event => {
     if (cursor) moveCursor(event, cursor);
 }
 
-const handleHexInput = () => {
-    const caretPos = elemColorHex.selectionStart;
-    const matches = elemColorHex.value.match(HEX_REGEX);
+const sanitizeInput = (element, regex) => {
+    const caretPos = element.selectionStart;
+    const matches = element.value.match(regex);
     const matchCount = matches ? matches.length : 0;
-    elemColorHex.value = elemColorHex.value.replaceAll(HEX_REGEX, '');
-    elemColorHex.selectionStart = caretPos - matchCount;
-    elemColorHex.selectionEnd = caretPos - matchCount;
+    element.value = element.value.replaceAll(regex, '');
+    element.selectionStart = caretPos - matchCount;
+    element.selectionEnd = caretPos - matchCount;
+}
+
+const handleHexInput = () => {
+    sanitizeInput(elemColorHex, HEX_REGEX)
 
     const color = '#' + autocompleteHex(elemColorHex.value);
     setColor(color);
@@ -273,7 +283,41 @@ const handleRandom = () => {
 }
 
 const handleSlider = (slider, label) => {
-    label.textContent = slider.value;
+    label.value = slider.value;
+}
+
+const handleSliderLabel = (label, slider) => {
+    if (!label.value) {
+        slider.value = 0;
+        return;
+    }
+
+    sanitizeInput(label, NUM_REGEX);
+
+    if (label.value[0] === '0' && label.value[1] !== '.') label.value = label.value[0];
+
+    // ensure that only one dot is included in the input value
+    let valueArray = label.value.split('.');
+    if (valueArray.length > 2) {
+        valueArray.forEach((item, index) => {
+            valueArray[index] = item.replaceAll('.', '');
+        })
+        valueArray = [valueArray[0], valueArray.slice(1).join('')];
+    }
+    label.value = valueArray.join('.');
+
+    const sliderMax = +slider.attributes.max.value;
+    const sliderMin = +slider.attributes.min.value;
+    if (+label.value > sliderMax) label.value = sliderMax;
+    if (+label.value < sliderMin) label.value = sliderMin;
+
+    if (label.value.length > MAX_SLIDER_LABEL_LENGTH) label.value = label.value.slice(0, MAX_SLIDER_LABEL_LENGTH);
+
+    slider.value = label.value;
+}
+
+const handleChangeLabel = label => {
+    if (!label.value) label.value = 0;
 }
 
 /* --------------------------------- EVENTS --------------------------------- */
@@ -290,17 +334,24 @@ elemBtnBrush.addEventListener('click', handleBrush);
 elemColorInput.addEventListener('input', handleColorChange);
 elemColorEyedropper.addEventListener('click', handleEyedropper);
 elemColorHex.addEventListener('input', handleHexInput);
+elemColorHex.addEventListener('focus', () => selectTextInput(elemColorHex));
 elemBtnClassic.addEventListener('click', handleClassic);
 elemBtnRandom.addEventListener('click', handleRandom);
 elemSliderOpacity.addEventListener('input', () => handleSlider(elemSliderOpacity, elemSliderOpacityLabel));
+elemSliderOpacityLabel.addEventListener('focus', () => selectTextInput(elemSliderOpacityLabel));
+elemSliderOpacityLabel.addEventListener('input', () => handleSliderLabel(elemSliderOpacityLabel, elemSliderOpacity));
+elemSliderOpacityLabel.addEventListener('change', () => handleChangeLabel(elemSliderOpacityLabel));
 elemSliderRandomness.addEventListener('input', () => handleSlider(elemSliderRandomness, elemSliderRandomnessLabel))
+elemSliderRandomnessLabel.addEventListener('focus', () => selectTextInput(elemSliderRandomnessLabel));
+elemSliderRandomnessLabel.addEventListener('input', () => handleSliderLabel(elemSliderRandomnessLabel, elemSliderRandomness));
+elemSliderRandomnessLabel.addEventListener('change', () => handleChangeLabel(elemSliderRandomnessLabel));
 
 /* ---------------------------------- INIT ---------------------------------- */
 
 createBoard(DEFAULT_ITEM_COUNT);
 elemColorInput.value = currentColor;
 elemColorHex.value = currentColor.slice(1);
-elemSliderOpacityLabel.textContent = DEFAULT_OPACITY;
+elemSliderOpacityLabel.value = DEFAULT_OPACITY;
 elemSliderOpacity.value = DEFAULT_OPACITY;
-elemSliderRandomnessLabel.textContent = DEFAULT_RANDOMNESS;
+elemSliderRandomnessLabel.value = DEFAULT_RANDOMNESS;
 elemSliderRandomness.value = DEFAULT_RANDOMNESS;

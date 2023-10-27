@@ -135,9 +135,10 @@ html.eyedropper-on .menu * {
 }
 
 .slider__label {
-    padding-top: 1px;
-    padding-left: 5px;
-    flex: 1;
+    /* padding-top: 1px; */
+    padding-left: 6px;
+    flex: 1 0 0;
+    width: 0;
     text-align: left;
     color: #333;
 }
@@ -215,15 +216,21 @@ html.eyedropper-on .menu * {
 
 }
 
-.color__hex__input {
+.text-input {
     background-color: transparent;
     color: inherit;
     border: none;
     letter-spacing: 0.7px;
+    cursor: pointer;
+}
+
+.text-input:focus {
+    outline: none;
+}
+
+.color__hex__input {
     padding: 5px 0 0 17.5px;
     z-index: 1;
-    cursor: pointer;
-
 }
 
 .color__hex__input:focus {

@@ -27,7 +27,7 @@
         <input type="color" class="color__input">
         <div class="color__hex">
           <p class="color__hex__hash">#</p>
-          <input type="text" class="color__hex__input" maxlength="6" size="6">
+          <input type="text" class="text-input color__hex__input" maxlength="6" size="6">
         </div>
         <button class="color__picker"><i class="fa-solid fa-eye-dropper"></i></button>
       </div>
@@ -37,12 +37,12 @@
       <button class="menu__item btn btn--small btn--classic switched-on"><i class="fa-solid fa-palette"></i></button>
       <button class="menu__item btn btn--small btn--random"><i class="fa-solid fa-dice-five"></i></button>
       <div class="slider__wrapper">
-        <input class="slider slider__opacity" type="range" min="0" max="1" step="0.01" value="1">
-        <label class="slider__label slider__opacity__label"></label>
+        <input class="slider slider__opacity" type="range" min="0" max="1" step="0.05" value="1">
+        <input class="text-input slider__label slider__opacity__label" type="text">
       </div>
       <div class="slider__wrapper">
-        <input class="slider slider__randomness" type="range" min="0" max="1" step="0.01" value="1">
-        <label class="slider__label slider__randomness__label"></label>
+        <input class="slider slider__randomness" type="range" min="0" max="1" step="0.05" value="1">
+        <input class="text-input slider__label slider__randomness__label" type="text">
       </div>
     </div>
     <div class="grid__wrapper grid--on"></div>
