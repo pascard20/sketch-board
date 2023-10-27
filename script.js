@@ -143,6 +143,18 @@ const randomizeColor = (decimalColor, factor) => {
     return newColor;
 }
 
+const randomizeOpacity = (opacity, factor) => {
+    factor = Math.sqrt(factor ** 4);
+    const randomValue = (Math.floor(Math.random() * 100 * 2 + 1) - 100) / 100;
+    let newOpacity = opacity + randomValue * factor;
+    if (newOpacity > 1) {
+        newOpacity = 1;
+    } else if (newOpacity < 0) {
+        newOpacity = 0;
+    }
+    return newOpacity;
+}
+
 const selectTextInput = element => {
     element.select();
 }
@@ -171,12 +183,14 @@ const handleHover = event => {
         let r = rgb[0];
         let g = rgb[1];
         let b = rgb[2];
+        let opacity = +elemSliderOpacity.value;
         if (random) {
-            r = randomizeColor(r, elemSliderRandomness.value);
-            g = randomizeColor(g, elemSliderRandomness.value);
-            b = randomizeColor(b, elemSliderRandomness.value);
-        }
-        const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], +elemSliderOpacity.value);
+            r = randomizeColor(r, +elemSliderRandomness.value);
+            g = randomizeColor(g, +elemSliderRandomness.value);
+            b = randomizeColor(b, +elemSliderRandomness.value);
+        } else opacity = randomizeOpacity(opacity, +elemSliderRandomness.value);
+        const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], opacity);
+        console.log(opacity);
         const newColor = '#' + rgbToHex(rgbOpacity);
         elemCurrent.style.backgroundColor = newColor;
     }
