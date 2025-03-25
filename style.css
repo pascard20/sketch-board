@@ -112,9 +112,12 @@ html.eyedropper-on .menu * {
 
 .menu__item {
     border-radius: 7px;
-    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3);
     animation: roll-up 1.1s .1s both;
     width: 100%;
+}
+
+.menu__item.shadow {
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3);
 }
 
 .btn {
@@ -136,7 +139,7 @@ html.eyedropper-on .menu * {
 
 .label__mode {
     display: flex;
-    margin: -1em 0 .3em;
+    margin: -1em 0 .4em;
     font-size: .825em;
     width: 100%;
     gap: .75em;
@@ -160,7 +163,8 @@ html.eyedropper-on .menu * {
 .label__mode-title {
     width: 100%;
     font-size: .825em;
-    margin-bottom: -.8em;
+    margin-bottom: -.85em;
+    margin-top: .2em;
     text-transform: uppercase;
     font-weight: 700;
 }
@@ -169,6 +173,7 @@ html.eyedropper-on .menu * {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    margin-bottom: -.5em;
 }
 
 .slider__wrapper p {
