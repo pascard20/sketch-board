@@ -11,7 +11,9 @@ const elemColorHex = document.querySelector('.color__hex__input');
 const elemColorEyedropper = document.querySelector('.color__picker');
 const elemColorWrapper = document.querySelector('.color__wrapper');
 const elemBtnClassic = document.querySelector('.btn--classic');
+const elemBtnClassicLabel = document.querySelector('.label__mode-opacity');
 const elemBtnRandom = document.querySelector('.btn--random');
+const elemBtnRandomLabel = document.querySelector('.label__mode-hue');
 const elemSliderOpacity = document.querySelector('.slider__opacity');
 const elemSliderOpacityLabel = document.querySelector('.slider__opacity__label');
 const elemSliderRandomness = document.querySelector('.slider__randomness');
@@ -26,7 +28,7 @@ const MAX_SLIDER_LABEL_LENGTH = 4;
 const HEX_REGEX = /([^a-f0-9])/gi;
 const NUM_REGEX = /([^0-9\.])/gi;
 const DEFAULT_COLOR = '#ffffff';
-const DEFAULT_OPACITY = 1;
+const DEFAULT_OPACITY = 100;
 const DEFAULT_RANDOMNESS = 0;
 
 /* -------------------------------- VARIABLES ------------------------------- */
@@ -38,7 +40,7 @@ let eraser = false;
 let currentColor = '#333333';
 let cachedColor = currentColor;
 let cachedEyedropperColor;
-let cachedMode;
+let cachedMode, cachedModeLabel;
 let modeButtons = [...document.querySelectorAll('.btn--mode')];
 
 /* -------------------------------- FUNCTIONS ------------------------------- */
@@ -179,6 +181,15 @@ const calculateWithOpacity = (elemCurrent, rgbArray, opacity) => {
     ];
 }
 
+const sanitizeInput = (element, regex) => {
+    const caretPos = element.selectionStart;
+    const matches = element.value.match(regex);
+    const matchCount = matches ? matches.length : 0;
+    element.value = element.value.replaceAll(regex, '');
+    element.selectionStart = caretPos - matchCount;
+    element.selectionEnd = caretPos - matchCount;
+}
+
 /* -------------------------------- HANDLERS -------------------------------- */
 
 const handleHover = event => {
@@ -198,12 +209,16 @@ const handleHover = event => {
             let r = rgb[0];
             let g = rgb[1];
             let b = rgb[2];
-            let opacity = +elemSliderOpacity.value;
+
+            const opacityValue = +elemSliderOpacity.value / 100;
+            const randomnessValue = +elemSliderRandomness.value / 100;
+
+            let opacity = opacityValue;
             if (random) {
-                r = randomizeColor(r, +elemSliderRandomness.value);
-                g = randomizeColor(g, +elemSliderRandomness.value);
-                b = randomizeColor(b, +elemSliderRandomness.value);
-            } else opacity = randomizeOpacity(opacity, +elemSliderRandomness.value);
+                r = randomizeColor(r, randomnessValue);
+                g = randomizeColor(g, randomnessValue);
+                b = randomizeColor(b, randomnessValue);
+            } else opacity = randomizeOpacity(opacity, randomnessValue);
             const rgbOpacity = calculateWithOpacity(elemCurrent, [r, g, b], opacity);
             const newColor = '#' + rgbToHex(rgbOpacity);
             elemCurrent.style.backgroundColor = newColor;
@@ -243,11 +258,13 @@ const handleEraser = () => {
         eraser = true;
     })
     cachedMode = document.querySelector('.btn--mode.switched-on');
+    cachedModeLabel = document.querySelector('.label__mode span.switched-on')
     modeButtons.forEach(item => {
         item.classList.remove('switched-on');
         item.classList.add('disabled');
         random = false;
     });
+    cachedModeLabel.classList.remove('switched-on');
 }
 
 const handleBrush = () => {
@@ -259,6 +276,7 @@ const handleBrush = () => {
             if (cachedMode.className.includes('btn--random')) random = true;
             cachedMode = null;
         }
+        if (cachedModeLabel) cachedModeLabel.classList.add('switched-on');
         modeButtons.forEach(item => item.classList.remove('disabled'));
     })
 }
@@ -309,15 +327,6 @@ const handleMouseMove = event => {
     if (cursor) moveCursor(event, cursor);
 }
 
-const sanitizeInput = (element, regex) => {
-    const caretPos = element.selectionStart;
-    const matches = element.value.match(regex);
-    const matchCount = matches ? matches.length : 0;
-    element.value = element.value.replaceAll(regex, '');
-    element.selectionStart = caretPos - matchCount;
-    element.selectionEnd = caretPos - matchCount;
-}
-
 const handleHexInput = () => {
     sanitizeInput(elemColorHex, HEX_REGEX)
 
@@ -330,6 +339,8 @@ const handleClassic = () => {
     if (!elemBtnClassic.className.includes('disabled')) {
         switchButtons(elemBtnClassic, elemBtnRandom, () => {
             random = false;
+            elemBtnClassicLabel.classList.add('switched-on')
+            elemBtnRandomLabel.classList.remove('switched-on')
         })
     }
 }
@@ -338,6 +349,8 @@ const handleRandom = () => {
     if (!elemBtnRandom.className.includes('disabled')) {
         switchButtons(elemBtnRandom, elemBtnClassic, () => {
             random = true;
+            elemBtnClassicLabel.classList.remove('switched-on')
+            elemBtnRandomLabel.classList.add('switched-on')
         })
     }
 }

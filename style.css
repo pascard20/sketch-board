@@ -44,7 +44,8 @@ body {
     flex-direction: column;
     font-family: 'Figtree', sans-serif;
     padding: 25px;
-    background-color: #FAFAFA;
+    background-color: #F9F9F9;
+    background-image: radial-gradient(circle, transparent 35%, #FCFCFC);
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -133,9 +134,48 @@ html.eyedropper-on .menu * {
     transition: .1s;
 }
 
+.label__mode {
+    display: flex;
+    margin: -1em 0 .3em;
+    font-size: .825em;
+    width: 100%;
+    gap: .75em;
+}
+
+.label__mode span {
+    display: block;
+    color: #8a8a8a;
+    text-align: center;
+    flex-grow: 4;
+    width: 0;
+    transition: .1s;
+}
+
+.label__mode span.switched-on {
+    color: #333;
+    font-weight: 600;
+    flex-grow: 5;
+}
+
+.label__mode-title {
+    width: 100%;
+    font-size: .825em;
+    margin-bottom: -.8em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
 .slider__wrapper {
     display: flex;
+    flex-wrap: wrap;
     width: 100%;
+}
+
+.slider__wrapper p {
+    display: block;
+    font-size: .85em;
+    letter-spacing: .5px;
+    margin-bottom: .2em;
 }
 
 .slider__label {
@@ -143,12 +183,12 @@ html.eyedropper-on .menu * {
     padding-left: 6px;
     flex: 1 0 0;
     width: 0;
-    text-align: left;
+    text-align: right;
     color: #333;
 }
 
 .slider {
-    width: 70%;
+    width: 75%;
     accent-color: #333;
 }
 
