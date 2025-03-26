@@ -41,9 +41,28 @@ let currentColor = '#333333';
 let cachedColor = currentColor;
 let cachedEyedropperColor;
 let cachedMode, cachedModeLabel;
+let cachedSettings = {
+    brush: new InitCachedSettings(DEFAULT_OPACITY, DEFAULT_RANDOMNESS),
+    eraser: new InitCachedSettings(DEFAULT_OPACITY, DEFAULT_RANDOMNESS)
+}
 let modeButtons = [...document.querySelectorAll('.btn--mode')];
 
 /* -------------------------------- FUNCTIONS ------------------------------- */
+
+function InitCachedSettings(opacity, randomness) {
+    this.opacity = opacity;
+    this.randomness = randomness;
+
+    this.update = function (opacity, randomness) {
+        this.opacity = opacity;
+        this.randomness = randomness;
+    }
+}
+
+const updateSliders = (opacity, randomness) => {
+    elemSliderOpacity.value = elemSliderOpacityLabel.value = opacity
+    elemSliderRandomness.value = elemSliderRandomnessLabel.value = randomness
+}
 
 const createBoard = itemCount => {
     elemRoot.style.setProperty('--gridItemCount', itemCount);
@@ -265,6 +284,9 @@ const handleEraser = () => {
         random = false;
     });
     cachedModeLabel.classList.remove('switched-on');
+
+    cachedSettings.brush.update(elemSliderOpacity.value, elemSliderRandomness.value);
+    updateSliders(cachedSettings.eraser.opacity, cachedSettings.eraser.randomness);
 }
 
 const handleBrush = () => {
@@ -279,6 +301,9 @@ const handleBrush = () => {
         if (cachedModeLabel) cachedModeLabel.classList.add('switched-on');
         modeButtons.forEach(item => item.classList.remove('disabled'));
     })
+
+    cachedSettings.eraser.update(elemSliderOpacity.value, elemSliderRandomness.value)
+    updateSliders(cachedSettings.brush.opacity, cachedSettings.brush.randomness);
 }
 
 const handleColorChange = () => {
