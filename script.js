@@ -38,7 +38,7 @@ let clicked = false;
 let eyedropper = false;
 let random = false;
 let eraser = false;
-let currentColor = '#333333';
+let currentColor = '#222222';
 let cachedColor = currentColor;
 let cachedEyedropperColor;
 let cachedMode, cachedModeLabel;
