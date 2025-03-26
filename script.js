@@ -29,7 +29,7 @@ const elemRoot = document.documentElement;
 /* -------------------------------- CONSTANTS ------------------------------- */
 
 const DEFAULT_ITEM_COUNT = 16;
-const MAX_ITEM_COUNT = 100;
+const MAX_ITEM_COUNT = 32;
 const MAX_SLIDER_LABEL_LENGTH = 4;
 const HEX_REGEX = /([^a-f0-9])/gi;
 const NUM_AND_DOT_REGEX = /([^0-9\.])/gi;
@@ -46,7 +46,7 @@ let clicked = false;
 let eyedropper = false;
 let random = false;
 let eraser = false;
-let currentColor = '#222222';
+let currentColor = '#2a2a2a';
 let cachedColor = currentColor;
 let cachedEyedropperColor;
 let cachedMode, cachedModeLabel;
