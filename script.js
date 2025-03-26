@@ -4,6 +4,7 @@ const elemGridWrapper = document.querySelector('.grid__wrapper');
 const elemBtnReset = document.querySelector('.btn--reset');
 const elemBtnBoard = document.querySelector('.btn--board');
 const elemBtnGrid = document.querySelector('.btn--grid');
+const elemBtnSave = document.querySelector('.btn--save');
 const elemBtnEraser = document.querySelector('.btn--eraser');
 const elemBtnBrush = document.querySelector('.btn--brush');
 const elemColorInput = document.querySelector('.color__input');
@@ -207,6 +208,32 @@ const sanitizeInput = (element, regex) => {
     element.value = element.value.replaceAll(regex, '');
     element.selectionStart = caretPos - matchCount;
     element.selectionEnd = caretPos - matchCount;
+}
+
+const savePixelArt = () => {
+    const grid = elemGridWrapper;
+    const divs = grid.querySelectorAll("div");
+    const gridSize = Math.sqrt(divs.length);
+
+    // Create a canvas
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const pixelSize = divs[0].offsetWidth * 2;
+    canvas.width = canvas.height = gridSize * pixelSize;
+
+    // Draw divs onto the canvas
+    divs.forEach((div, index) => {
+        const x = (index % gridSize) * pixelSize;
+        const y = Math.floor(index / gridSize) * pixelSize;
+        ctx.fillStyle = window.getComputedStyle(div).backgroundColor;
+        ctx.fillRect(x, y, pixelSize, pixelSize);
+    });
+
+    // Convert canvas to image and download
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "pixel-art.png";
+    link.click();
 }
 
 /* -------------------------------- HANDLERS -------------------------------- */
@@ -427,6 +454,7 @@ window.addEventListener('mouseup', handleRelease);
 elemBtnReset.addEventListener('click', handleReset);
 elemBtnBoard.addEventListener('click', handleNewBoard);
 elemBtnGrid.addEventListener('click', handleToggleGrid);
+elemBtnSave.addEventListener('click', savePixelArt);
 elemBtnEraser.addEventListener('click', handleEraser);
 elemBtnBrush.addEventListener('click', handleBrush);
 elemColorInput.addEventListener('input', handleColorChange);
