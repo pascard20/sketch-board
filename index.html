@@ -41,7 +41,7 @@
           <button class="color__picker"><i class="fa-solid fa-eye-dropper"></i></button>
         </div>
 
-        <button class="menu__item shadow btn btn--reset">Reset</button>
+        <button class="menu__item shadow btn btn--reset">Reset board</button>
         <button class="menu__item shadow btn btn--board">New board</button>
         <button class="menu__item shadow btn btn--grid">Toggle grid</button>
 
@@ -72,16 +72,18 @@
           <span class="label-title label__resolution-title">Image resolution</span>
           <div class="resolution-mode__wrapper">
             <label>
-              <input class="resolution__radio" type="radio" name="resolution-mode" value="default" checked> Default
+              <input class="resolution__radio resolution__radio-default" type="radio" name="resolution-mode"
+                value="default"> Default
             </label>
             <label>
-              <input class="resolution__radio" type="radio" name="resolution-mode" value="custom"> Custom
+              <input class="resolution__radio resolution__radio-custom" type="radio" name="resolution-mode"
+                value="custom"> Custom
             </label>
           </div>
 
           <div class="resolution-input__wrapper">
-            <input type="tel" class="resolution__width-input" value="1920">
-            <span class="resolution-display">x <span class="height-display">4096</span> px</span>
+            <input type="tel" class="resolution__width-input" value="">
+            <span class="resolution-display">x <span class="height-display"></span> px</span>
           </div>
         </div>
 

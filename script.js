@@ -19,7 +19,12 @@ const elemSliderOpacity = document.querySelector('.slider__opacity');
 const elemSliderOpacityLabel = document.querySelector('.slider__opacity__label');
 const elemSliderRandomness = document.querySelector('.slider__randomness');
 const elemSliderRandomnessLabel = document.querySelector('.slider__randomness__label');
+const elemRadioDefault = document.querySelector('.resolution__radio-default');
+const elemRadioCustom = document.querySelector('.resolution__radio-custom');
+const elemHeightDisplay = document.querySelector('.height-display');
+const elemResolutionInput = document.querySelector('.resolution__width-input');
 const elemRoot = document.documentElement;
+
 
 /* -------------------------------- CONSTANTS ------------------------------- */
 
@@ -27,10 +32,13 @@ const DEFAULT_ITEM_COUNT = 16;
 const MAX_ITEM_COUNT = 100;
 const MAX_SLIDER_LABEL_LENGTH = 4;
 const HEX_REGEX = /([^a-f0-9])/gi;
-const NUM_REGEX = /([^0-9\.])/gi;
+const NUM_AND_DOT_REGEX = /([^0-9\.])/gi;
+const NUM_REGEX = /([^0-9])/gi;
 const DEFAULT_COLOR = '#ffffff';
 const DEFAULT_OPACITY = 100;
 const DEFAULT_RANDOMNESS = 0;
+const MAX_RESOLUTION = 4096;
+const DEFAULT_RESOLUTION_MODE = 'default';
 
 /* -------------------------------- VARIABLES ------------------------------- */
 
@@ -47,6 +55,8 @@ let cachedSettings = {
     eraser: new InitCachedSettings(DEFAULT_OPACITY, DEFAULT_RANDOMNESS)
 }
 let modeButtons = [...document.querySelectorAll('.btn--mode')];
+let exportResolution, cachedResolution
+exportResolution = cachedResolution = DEFAULT_ITEM_COUNT;
 
 /* -------------------------------- FUNCTIONS ------------------------------- */
 
@@ -211,14 +221,12 @@ const sanitizeInput = (element, regex) => {
 }
 
 const savePixelArt = () => {
-    const grid = elemGridWrapper;
-    const divs = grid.querySelectorAll("div");
-    const gridSize = Math.sqrt(divs.length);
+    const { divCount: gridSize, divList: divs } = calculateDivs();
 
     // Create a canvas
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const pixelSize = divs[0].offsetWidth * 2;
+    const pixelSize = exportResolution / gridSize;
     canvas.width = canvas.height = gridSize * pixelSize;
 
     // Draw divs onto the canvas
@@ -236,12 +244,23 @@ const savePixelArt = () => {
     link.click();
 }
 
+const calculateDivs = () => {
+    const grid = elemGridWrapper;
+    const divs = grid.querySelectorAll("div");
+    return { divCount: Math.sqrt(divs.length), divList: divs };
+}
+
+const initializeRadio = () => {
+    const radio = document.querySelector(`.resolution__radio[value="${DEFAULT_RESOLUTION_MODE}"]`);
+    radio.checked = true;
+    radio.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
 /* -------------------------------- HANDLERS -------------------------------- */
 
 const handleHover = event => {
     elemCurrent = event.target;
     if (elemCurrent.closest('.grid__wrapper')) {
-        console.log('aa');
         if (elemCurrent.className.includes('wrapper')) return;
         if (eyedropper) {
             const hoverColorArray = elemCurrent.style.backgroundColor.slice(4, -1).split(', ');
@@ -290,7 +309,11 @@ const handleReset = () => {
 
 const handleNewBoard = () => {
     const newItemCount = prompt(`Enter number of columns/rows (max ${MAX_ITEM_COUNT}):`)
-    if (newItemCount > 0 && newItemCount <= MAX_ITEM_COUNT) createBoard(newItemCount);
+    if (newItemCount > 0 && newItemCount <= MAX_ITEM_COUNT) {
+        createBoard(newItemCount);
+        initializeRadio();
+        exportResolution = cachedResolution = newItemCount;
+    }
 };
 
 const handleToggleGrid = () => {
@@ -417,7 +440,7 @@ const handleSliderLabel = (label, slider) => {
         return;
     }
 
-    sanitizeInput(label, NUM_REGEX);
+    sanitizeInput(label, NUM_AND_DOT_REGEX);
 
     if (label.value[0] === '0' && label.value[1] !== '.') label.value = label.value[0];
 
@@ -443,6 +466,45 @@ const handleSliderLabel = (label, slider) => {
 
 const handleChangeLabel = label => {
     if (!label.value) label.value = 0;
+}
+
+const handleResolutionChange = () => {
+    divCount = calculateDivs().divCount;
+
+    elemResolutionInput.value = Math.max(divCount, Math.min(elemResolutionInput.value, MAX_RESOLUTION));
+
+    let diff = elemResolutionInput.value % divCount;
+    elemResolutionInput.value = +elemResolutionInput.value + Math.round(diff / divCount) * divCount - diff;
+
+    elemHeightDisplay.textContent = elemResolutionInput.value;
+    exportResolution = elemResolutionInput.value;
+}
+
+const handleResolutionKeypress = event => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        event.target.blur();
+    } else {
+        divCount = calculateDivs().divCount
+        if (event.key === 'ArrowUp') {
+            event.target.value = +event.target.value + divCount
+        } else if (event.key === 'ArrowDown') {
+            event.target.value = +event.target.value - divCount
+        }
+    }
+}
+
+const handleRadio = event => {
+    if (event.target.value === 'default') {
+        elemResolutionInput.disabled = true;
+        cachedResolution = elemResolutionInput.value
+        elemResolutionInput.value = calculateDivs().divCount;
+    } else if (event.target.value === 'custom') {
+        elemResolutionInput.disabled = false;
+        elemResolutionInput.value = cachedResolution;
+        console.log(cachedResolution);
+    }
+    elemResolutionInput.dispatchEvent(new Event('blur', { bubbles: true }));
 }
 
 /* --------------------------------- EVENTS --------------------------------- */
@@ -471,6 +533,11 @@ elemSliderRandomness.addEventListener('input', () => handleSlider(elemSliderRand
 elemSliderRandomnessLabel.addEventListener('focus', () => selectTextInput(elemSliderRandomnessLabel));
 elemSliderRandomnessLabel.addEventListener('input', () => handleSliderLabel(elemSliderRandomnessLabel, elemSliderRandomness));
 elemSliderRandomnessLabel.addEventListener('change', () => handleChangeLabel(elemSliderRandomnessLabel));
+elemResolutionInput.addEventListener('input', () => sanitizeInput(elemResolutionInput, NUM_REGEX));
+elemResolutionInput.addEventListener('blur', handleResolutionChange);
+elemResolutionInput.addEventListener('keydown', handleResolutionKeypress);
+elemRadioDefault.addEventListener('change', handleRadio);
+elemRadioCustom.addEventListener('change', handleRadio);
 
 /* ---------------------------------- INIT ---------------------------------- */
 
@@ -481,3 +548,5 @@ elemSliderOpacityLabel.value = DEFAULT_OPACITY;
 elemSliderOpacity.value = DEFAULT_OPACITY;
 elemSliderRandomnessLabel.value = DEFAULT_RANDOMNESS;
 elemSliderRandomness.value = DEFAULT_RANDOMNESS;
+elemHeightDisplay.textContent = elemResolutionInput.value = exportResolution;
+initializeRadio()

@@ -31,6 +31,7 @@ input {
     --darkBlack: #222;
     --darkGray: #707070;
     --lightGray: #909090;
+    --veryLightGray: #a0a0a0;
 }
 
 /* --------------------------------- GENERAL -------------------------------- */
@@ -219,7 +220,7 @@ html.eyedropper-on .menu * {
 }
 
 .label__resolution-title {
-    margin: 1.6rem 0 .7rem;
+    margin: 1.6rem 0 .6rem;
     width: 100%;
 }
 
@@ -236,13 +237,11 @@ html.eyedropper-on .menu * {
     justify-content: center;
     gap: .1rem;
     font-size: 1.3rem;
-
 }
 
 .resolution-input__wrapper>* {
     flex-grow: 3;
     width: 0;
-    /* background: red; */
 }
 
 .resolution-display {
@@ -253,17 +252,21 @@ html.eyedropper-on .menu * {
 }
 
 .resolution__width-input {
-    padding: .2rem .4rem;
+    padding: .3rem .5rem;
     text-align: right;
-    border-radius: .5rem;
+    border-radius: .4rem;
     border: 1px solid var(--darkBlack);
+}
+
+.resolution__width-input:disabled {
+    color: var(--darkGray);
+    border-color: var(--veryLightGray);
 }
 
 .resolution-mode__wrapper {
     font-size: 1.2rem;
     display: flex;
     justify-items: center;
-    /* background: red; */
     gap: .8rem;
     margin: .3rem auto .7rem;
 }
